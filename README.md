@@ -30,9 +30,9 @@ WaveGlow models.
         - The corresponding IPA symbols for each code can be found [here](https://en.wikipedia.org/wiki/ARPABET)
     - An example of a valid `.csv` is found in `input.csv`
 2. Run `python data_generation.py CSV_FILE_NAME OUTPUT_FOLDER_LOCATION`
-    - By default, the script will look at `input.csv` and output data directly into `/data`
-        - Otherwise, the generated data will be found in `/data/OUTPUT_FOLDER_LOCATION/`
-    - Pre-generated data using `input.csv` can be found in `/data`
+    - By default, the script will look at `input.csv` and output data directly into the `/data` directory
+        - Otherwise, the generated data will be found in `/data/OUTPUT_FOLDER_LOCATION`
+    - An example of pre-generated data using `input.csv` is found in the `/data` directory
 
 ## Acknowledgements
 This code exclusively uses code from NVIDIA's Tacotron 2 [implemention](https://github.com/NVIDIA/tacotron2) 
