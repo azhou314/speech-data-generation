@@ -1,81 +1,38 @@
-# Tacotron 2 (without wavenet)
+# Speech Data Generation
 
-PyTorch implementation of [Natural TTS Synthesis By Conditioning
-Wavenet On Mel Spectrogram Predictions](https://arxiv.org/pdf/1712.05884.pdf). 
-
-This implementation includes **distributed** and **automatic mixed precision** support
-and uses the [LJSpeech dataset](https://keithito.com/LJ-Speech-Dataset/).
-
-Distributed and Automatic Mixed Precision support relies on NVIDIA's [Apex] and [AMP].
-
-Visit our [website] for audio samples using our published [Tacotron 2] and
-[WaveGlow] models.
-
-![Alignment, Predicted Mel Spectrogram, Target Mel Spectrogram](tensorboard.png)
+A quick script to generate audio speech data using NVIDIA's Tacotron 2 and
+WaveGlow models.
 
 
 ## Pre-requisites
 1. NVIDIA GPU + CUDA cuDNN
 
 ## Setup
-1. Download and extract the [LJ Speech dataset](https://keithito.com/LJ-Speech-Dataset/)
-2. Clone this repo: `git clone https://github.com/NVIDIA/tacotron2.git`
-3. CD into this repo: `cd tacotron2`
-4. Initialize submodule: `git submodule init; git submodule update`
-5. Update .wav paths: `sed -i -- 's,DUMMY,ljs_dataset_folder/wavs,g' filelists/*.txt`
-    - Alternatively, set `load_mel_from_disk=True` in `hparams.py` and update mel-spectrogram paths 
-6. Install [PyTorch 1.0]
-7. Install [Apex]
-8. Install python requirements or build docker image 
-    - Install python requirements: `pip install -r requirements.txt`
+1. Clone this repo: `git clone https://github.com/azhou314/speech-data-generation.git`
+2. CD into this repo: `cd speech-data-generation`
+3. Initialize WaveGlow submodule: `git submodule init; git submodule update`
+4. Download pretrained [Tacotron](https://drive.google.com/file/d/1c5ZTuT7J08wLUoVZ2KkUs_VdZuJ86ZqA/view) and [WaveGlow](https://drive.google.com/file/d/1rpK8CzAAirq9sWZhe9nlfvxMF1dRgFbF/view) models from NVIDIA and place into the repo
 
-## Training
-1. `python train.py --output_directory=outdir --log_directory=logdir`
-2. (OPTIONAL) `tensorboard --logdir=outdir/logdir`
-
-## Training using a pre-trained model
-Training using a pre-trained model can lead to faster convergence  
-By default, the dataset dependent text embedding layers are [ignored]
-
-1. Download our published [Tacotron 2] model
-2. `python train.py --output_directory=outdir --log_directory=logdir -c tacotron2_statedict.pt --warm_start`
-
-## Multi-GPU (distributed) and Automatic Mixed Precision Training
-1. `python -m multiproc train.py --output_directory=outdir --log_directory=logdir --hparams=distributed_run=True,fp16_run=True`
-
-## Inference demo
-1. Download our published [Tacotron 2] model
-2. Download our published [WaveGlow] model
-3. `jupyter notebook --ip=127.0.0.1 --port=31337`
-4. Load inference.ipynb 
-
-N.b.  When performing Mel-Spectrogram to Audio synthesis, make sure Tacotron 2
-and the Mel decoder were trained on the same mel-spectrogram representation. 
-
-
-## Related repos
-[WaveGlow](https://github.com/NVIDIA/WaveGlow) Faster than real time Flow-based
-Generative Network for Speech Synthesis
-
-[nv-wavenet](https://github.com/NVIDIA/nv-wavenet/) Faster than real time
-WaveNet.
+## Data generation
+1. Create a `.csv` file of the desired speech data. The file should have two columns. The first column should be of the words/phrases to be generated (without punctuation), and the second column should contain the number of times to sample each word or phrase.
+    - Words or phrases can be specified in conventional English orthography, or in ARPABET
+    - To specify words/phrases in ARPABET, surround with curly braces and use 2-letter codes:
+        - The list of valid 2-letter codes is found below, where numbers are appended to vowels to signify stress:
+            ```
+            valid_symbols = ['AA', 'AA0', 'AA1', 'AA2', 'AE', 'AE0', 'AE1', 'AE2', 'AH', 'AH0', 'AH1', 'AH2',
+                             'AO', 'AO0', 'AO1', 'AO2', 'AW', 'AW0', 'AW1', 'AW2', 'AY', 'AY0', 'AY1', 'AY2',
+                             'B', 'CH', 'D', 'DH', 'EH', 'EH0', 'EH1', 'EH2', 'ER', 'ER0', 'ER1', 'ER2', 'EY',
+                             'EY0', 'EY1', 'EY2', 'F', 'G', 'HH', 'IH', 'IH0', 'IH1', 'IH2', 'IY', 'IY0', 'IY1',
+                             'IY2', 'JH', 'K', 'L', 'M', 'N', 'NG', 'OW', 'OW0', 'OW1', 'OW2', 'OY', 'OY0',
+                             'OY1', 'OY2', 'P', 'R', 'S', 'SH', 'T', 'TH', 'UH', 'UH0', 'UH1', 'UH2', 'UW',
+                             'UW0', 'UW1', 'UW2', 'V', 'W', 'Y', 'Z', 'ZH']
+            ```
+        - The corresponding IPA symbols for each code can be found [here](https://en.wikipedia.org/wiki/ARPABET)
+    - An example of a valid `.csv` is found in `input.csv`
+2. Run `python data_generation.py CSV_FILE_NAME OUTPUT_FOLDER_LOCATION`
+    - By default, the script will look at `input.csv` and output data directly into `/data`
+        - Otherwise, the generated data will be found in `/data/OUTPUT_FOLDER_LOCATION/`
+    - Pre-generated data using `input.csv` can be found in `/data`
 
 ## Acknowledgements
-This implementation uses code from the following repos: [Keith
-Ito](https://github.com/keithito/tacotron/), [Prem
-Seetharaman](https://github.com/pseeth/pytorch-stft) as described in our code.
-
-We are inspired by [Ryuchi Yamamoto's](https://github.com/r9y9/tacotron_pytorch)
-Tacotron PyTorch implementation.
-
-We are thankful to the Tacotron 2 paper authors, specially Jonathan Shen, Yuxuan
-Wang and Zongheng Yang.
-
-
-[WaveGlow]: https://drive.google.com/open?id=1rpK8CzAAirq9sWZhe9nlfvxMF1dRgFbF
-[Tacotron 2]: https://drive.google.com/file/d/1c5ZTuT7J08wLUoVZ2KkUs_VdZuJ86ZqA/view?usp=sharing
-[pytorch 1.0]: https://github.com/pytorch/pytorch#installation
-[website]: https://nv-adlr.github.io/WaveGlow
-[ignored]: https://github.com/NVIDIA/tacotron2/blob/master/hparams.py#L22
-[Apex]: https://github.com/nvidia/apex
-[AMP]: https://github.com/NVIDIA/apex/tree/master/apex/amp
+This code exclusively uses code from NVIDIA's Tacotron 2 [implemention](https://github.com/NVIDIA/tacotron2) 
