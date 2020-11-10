@@ -1,7 +1,13 @@
-John went,
-Sally ate,
-Alice wrote,
-Bob read,
-The dog ran,
-Did the dog run,
-{JH AA0 N  W EH1 N T}
+John went, 10
+Sally ate, 10
+Alice wrote, 10
+Bob read, 10
+The dog ran, 10
+Did the dog run, 10
+I ate, 10
+{JH AA1 N  W EH2 N T}, 10
+{JH AA1 N} {W EH2 N T}, 10
+{AE1 L IH2 S R OW1 T}, 10
+{AE1 L IH2 S} {R OW1 T}, 10
+{DH AH2} {D AA1 G} {R AE1 N}, 10
+{DH AH2 D AA1 G R AE1 N}, 10
